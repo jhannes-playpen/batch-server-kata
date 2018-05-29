@@ -12,7 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,27 +19,15 @@ import javax.sql.DataSource;
 
 import lombok.SneakyThrows;
 
-public class BatchFileRepository {
+public class BatchFileRepository extends AbstractSqlRepository {
 
-    private DataSource dataSource;
 
     public BatchFileRepository(DataSource dataSource) {
-        this.dataSource = dataSource;
+        super(dataSource);
     }
 
-    @SneakyThrows(SQLException.class)
     public List<BatchFile> list() {
-        List<BatchFile> result = new ArrayList<>();
-        try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("select * from batch_files")) {
-                try(ResultSet rs = statement.executeQuery()) {
-                    while (rs.next()) {
-                        result.add(mapBatchFile(rs));
-                    }
-                }
-            }
-        }
-        return result;
+        return queryForList("select * from batch_files", this::mapBatchFile);
     }
 
     public void save(String batchType, String submittedFileName, InputStream inputStream) throws IOException {
@@ -78,21 +65,8 @@ public class BatchFileRepository {
         }
     }
 
-    @SneakyThrows(SQLException.class)
     public BatchFile retrieve(UUID id) {
-        try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("select * from batch_files where id = ?")) {
-                statement.setObject(1, id);
-                
-                try(ResultSet rs = statement.executeQuery()) {
-                    if (rs.next()) {
-                        return mapBatchFile(rs);
-                    } else {
-                        return null;
-                    }
-                }
-            }
-        }
+        return queryForSingle("select * from batch_files where id = ?", id, this::mapBatchFile);
     }
 
     private BatchFile mapBatchFile(ResultSet rs) throws SQLException {
