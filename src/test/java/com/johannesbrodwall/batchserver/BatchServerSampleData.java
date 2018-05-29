@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import com.johannesbrodwall.batchserver.batchfile.BatchFile;
+import com.johannesbrodwall.batchserver.medications.MedicationInteraction;
 
 public class BatchServerSampleData {
     
@@ -28,6 +29,17 @@ public class BatchServerSampleData {
 
     private Path sampleFilePath() {
         return tmpDir.resolve(UUID.randomUUID().toString());
+    }
+
+    public MedicationInteraction sampleMedicationInteraction() {
+        MedicationInteraction medicationInteraction = new MedicationInteraction();
+        medicationInteraction.setId("ID_" + UUID.randomUUID().toString().toUpperCase());
+        medicationInteraction.setClinicalConsequence(pickOne("Risiko for toksiske...", "Ingen", "Magesmerter"));
+        return medicationInteraction;
+    }
+
+    private <T> T pickOne(T... alternatives) {
+        return alternatives[random.nextInt(alternatives.length)];
     }
 
 }

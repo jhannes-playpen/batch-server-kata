@@ -26,4 +26,9 @@ public class MedicationInteractionRepository extends AbstractSqlRepository {
         
     }
 
+    public void save(MedicationInteraction interaction) {
+        // TODO Auto-generated method stub
+        
+    }
+
 }
