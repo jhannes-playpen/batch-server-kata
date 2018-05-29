@@ -35,6 +35,7 @@ public class BatchServerSampleData {
         MedicationInteraction medicationInteraction = new MedicationInteraction();
         medicationInteraction.setId("ID_" + UUID.randomUUID().toString().toUpperCase());
         medicationInteraction.setClinicalConsequence(pickOne("Risiko for toksiske...", "Ingen", "Magesmerter"));
+        medicationInteraction.setInteractionMechanism(pickOne("Metylfenidat frigjør...", "Magi!", "Vin og så øl blir krøll"));
         return medicationInteraction;
     }
 

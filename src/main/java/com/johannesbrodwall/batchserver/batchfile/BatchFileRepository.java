@@ -17,6 +17,8 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
+import org.assertj.core.util.Arrays;
+
 import lombok.SneakyThrows;
 
 public class BatchFileRepository extends AbstractSqlRepository {
@@ -51,9 +53,14 @@ public class BatchFileRepository extends AbstractSqlRepository {
     public void save(BatchFile file) {
         file.setId(UUID.randomUUID());
         
+        String sql = "insert into batch_files (id, file_location, file_length, submitted_filename, upload_time) values (?, ?, ?, ?, ?)";
+        List<Object> arguments = Arrays.asList(new Object[] { file.getId().toString(), file.getFileLocation().toString(),
+                new Long(file.getFileLength()), file.getSubmittedFileName(), file.getUploadTime() });
         try (Connection connection = dataSource.getConnection()) {
-            String sql = "insert into batch_files (id, file_location, file_length, submitted_filename, upload_time) values (?, ?, ?, ?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                for (int i = 0; i < arguments.size(); i++) {
+                    statement.setObject(i+1, arguments.get(i));
+                }
                 statement.setObject(1, file.getId().toString());
                 statement.setString(2, file.getFileLocation().toString());
                 statement.setObject(3, file.getFileLength());
