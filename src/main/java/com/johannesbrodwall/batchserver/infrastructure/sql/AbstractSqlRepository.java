@@ -1,4 +1,4 @@
-package com.johannesbrodwall.batchserver.batchfile;
+package com.johannesbrodwall.batchserver.infrastructure.sql;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,7 +10,7 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import com.johannesbrodwall.batchserver.infrastructure.sql.RowMapper;
+import org.assertj.core.util.Arrays;
 
 import lombok.SneakyThrows;
 
@@ -50,6 +50,20 @@ public abstract class AbstractSqlRepository {
                         return null;
                     }
                 }
+            }
+        }
+    }
+
+    @SneakyThrows(SQLException.class)
+    protected void executeUpdate(String sql, Object... parameters) {
+        List<Object> arguments = Arrays.asList(parameters);
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                for (int i = 0; i < arguments.size(); i++) {
+                    statement.setObject(i+1, arguments.get(i));
+                }
+                
+                statement.executeUpdate();
             }
         }
     }

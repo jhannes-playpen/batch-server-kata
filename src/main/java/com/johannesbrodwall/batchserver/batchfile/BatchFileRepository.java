@@ -6,8 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -17,12 +15,9 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import org.assertj.core.util.Arrays;
-
-import lombok.SneakyThrows;
+import com.johannesbrodwall.batchserver.infrastructure.sql.AbstractSqlRepository;
 
 public class BatchFileRepository extends AbstractSqlRepository {
-
 
     public BatchFileRepository(DataSource dataSource) {
         super(dataSource);
@@ -49,27 +44,16 @@ public class BatchFileRepository extends AbstractSqlRepository {
         save(batchFile);
     }
 
-    @SneakyThrows(SQLException.class)
     public void save(BatchFile file) {
         file.setId(UUID.randomUUID());
         
-        String sql = "insert into batch_files (id, file_location, file_length, submitted_filename, upload_time) values (?, ?, ?, ?, ?)";
-        List<Object> arguments = Arrays.asList(new Object[] { file.getId().toString(), file.getFileLocation().toString(),
-                new Long(file.getFileLength()), file.getSubmittedFileName(), file.getUploadTime() });
-        try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                for (int i = 0; i < arguments.size(); i++) {
-                    statement.setObject(i+1, arguments.get(i));
-                }
-                statement.setObject(1, file.getId().toString());
-                statement.setString(2, file.getFileLocation().toString());
-                statement.setObject(3, file.getFileLength());
-                statement.setObject(4, file.getSubmittedFileName());
-                statement.setObject(5, file.getUploadTime());
-                
-                statement.executeUpdate();
-            }
-        }
+        executeUpdate(
+                "insert into batch_files (id, file_location, file_length, submitted_filename, upload_time) values (?, ?, ?, ?, ?)",
+                file.getId().toString(),
+                file.getFileLocation().toString(),
+                file.getFileLength(),
+                file.getSubmittedFileName(),
+                file.getUploadTime());
     }
 
     public BatchFile retrieve(UUID id) {

@@ -2,7 +2,6 @@ package com.johannesbrodwall.batchserver.medications;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.johannesbrodwall.batchserver.BatchServerSampleData;
@@ -13,7 +12,6 @@ public class MedicationInteractionRepositoryTest {
     private MedicationInteractionRepository repository = new MedicationInteractionRepository(TestDataSource.testDataSource());
     
     @Test
-    @Ignore
     public void shouldListSavedInteractions() {
         MedicationInteraction interaction = new BatchServerSampleData().sampleMedicationInteraction();
         
