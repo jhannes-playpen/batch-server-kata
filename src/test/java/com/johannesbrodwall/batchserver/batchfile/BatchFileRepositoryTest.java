@@ -2,6 +2,8 @@ package com.johannesbrodwall.batchserver.batchfile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.UUID;
+
 import org.junit.Test;
 
 import com.johannesbrodwall.batchserver.BatchServerSampleData;
@@ -32,5 +34,15 @@ public class BatchFileRepositoryTest {
             .isEqualToComparingFieldByField(file);
     }
     
-    
+    @Test
+    public void shouldUpdateSavedBatchFile() {
+        BatchFile file = sampleData.sampleBatchFile();
+        repository.save(file);
+        UUID id = file.getId();
+        
+        file.setStatus(BatchFile.Status.COMPLETE);
+        file.setSubmittedFileName(sampleData.randomFileName());
+        repository.save(file);
+        assertThat(repository.retrieve(id)).isEqualToComparingFieldByField(file);
+    }
 }

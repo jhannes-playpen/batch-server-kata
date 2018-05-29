@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
+import com.johannesbrodwall.batchserver.batchfile.BatchFile.Status;
 import com.johannesbrodwall.batchserver.infrastructure.sql.AbstractSqlRepository;
 
 public class BatchFileRepository extends AbstractSqlRepository {
@@ -47,15 +48,28 @@ public class BatchFileRepository extends AbstractSqlRepository {
     }
 
     public void save(BatchFile file) {
-        file.setId(UUID.randomUUID());
-        
-        executeUpdate(
-                "insert into batch_files (id, file_location, file_length, submitted_filename, upload_time) values (?, ?, ?, ?, ?)",
-                file.getId().toString(),
-                file.getFileLocation().toString(),
-                file.getFileLength(),
-                file.getSubmittedFileName(),
-                file.getUploadTime());
+        if (file.getId() == null) {
+            file.setId(UUID.randomUUID());
+            
+            executeUpdate(
+                    "insert into batch_files (id, file_location, file_length, submitted_filename, upload_time, status) values (?, ?, ?, ?, ?, ?)",
+                    file.getId(),
+                    file.getFileLocation(),
+                    file.getFileLength(),
+                    file.getSubmittedFileName(),
+                    file.getUploadTime(),
+                    file.getStatus());
+        } else {
+            executeUpdate(
+                    "update batch_files set file_location = ?, file_length = ?, submitted_filename = ?, upload_time = ?, status = ? where id = ?",
+                    file.getFileLocation(),
+                    file.getFileLength(),
+                    file.getSubmittedFileName(),
+                    file.getUploadTime(),
+                    file.getStatus(),
+                    file.getId());
+            
+        }
     }
 
     public BatchFile retrieve(UUID id) {
@@ -69,6 +83,7 @@ public class BatchFileRepository extends AbstractSqlRepository {
         batchFile.setFileLength(rs.getLong("file_length"));
         batchFile.setSubmittedFileName(rs.getString("submitted_filename"));
         batchFile.setUploadTime(rs.getTimestamp("upload_time").toInstant());
+        batchFile.setStatus(Status.valueOf(rs.getString("status")));
         return batchFile;
     }
 

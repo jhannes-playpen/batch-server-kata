@@ -3,5 +3,6 @@ create table batch_files (
 	file_location varchar(100) not null,
 	file_length integer,
 	submitted_filename varchar(100),
-	upload_time timestamp
+	upload_time timestamp,
+	status varchar(30) not null
 );

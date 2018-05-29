@@ -18,9 +18,13 @@ public class BatchServerSampleData {
         BatchFile batchFile = new BatchFile();
         batchFile.setFileLength(100L);
         batchFile.setFileLocation(sampleFilePath());
-        batchFile.setSubmittedFileName(UUID.randomUUID() + ".xml.gz");
+        batchFile.setSubmittedFileName(randomFileName());
         batchFile.setUploadTime(samplePastInstant());
         return batchFile;
+    }
+
+    public String randomFileName() {
+        return UUID.randomUUID() + ".xml.gz";
     }
 
     private Instant samplePastInstant() {

@@ -34,10 +34,10 @@ public class BatchServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         JsonArray result = JsonArray.map(repository.get().list(), f -> new JsonObject()
-                .put("id", 1)
-                .put("batchtype", "Fest")
-                .put("startTime", Instant.now())
-                .put("status", "ok")
+                .put("id", f.getId().toString())
+                .put("batchtype", f.getSubmittedFileName())
+                .put("startTime", f.getUploadTime())
+                .put("status", f.getStatus())
                 .put("progress", "90%"));
         
         resp.setContentType("application/json");

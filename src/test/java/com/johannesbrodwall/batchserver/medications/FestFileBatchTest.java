@@ -15,13 +15,16 @@ import org.eaxy.Xml;
 import org.junit.Test;
 
 import com.johannesbrodwall.batchserver.TestDataSource;
+import com.johannesbrodwall.batchserver.batchfile.BatchFile;
+import com.johannesbrodwall.batchserver.batchfile.BatchFileRepository;
 
 
-public class FestFileProcessorTest {
+public class FestFileBatchTest {
     
     private static final Namespace M30 = new Namespace("http://www.kith.no/xmlstds/eresept/m30/2014-12-01", "m30");
     private Validator validator = Xml.validatorFromResource("R1808-eResept-M30-2014-12-01/ER-M30-2014-12-01.xsd");
     private DataSource dataSource = TestDataSource.testDataSource();
+    private BatchFileRepository batchFileRepository = new BatchFileRepository(dataSource);
     
     @Test
     public void shouldReadFullFile() throws IOException {
@@ -33,6 +36,28 @@ public class FestFileProcessorTest {
 
         assertThat(repository.list()).isNotEmpty();
     }
+    
+    @Test
+    public void shouldUpdateStatus() throws IOException {
+        repository.deleteAll();
+        
+        String file = "fest-mini.xml.gz";
+        BatchFile batchFile = batchFileRepository.save("fest", file, getClass().getResourceAsStream("/" + file));
+        
+        assertThat(batchFile.getStatus()).isEqualTo(BatchFile.Status.PENDING);
+        
+        FestFileBatch batch = new FestFileBatch(batchFile.getId(), () -> batchFileRepository, () -> repository);
+        
+        batch.start();
+        assertThat(batchFileRepository.retrieve(batchFile.getId()).getStatus())
+            .isEqualTo(BatchFile.Status.PROCESSING);
+        batch.run();
+        assertThat(batchFileRepository.retrieve(batchFile.getId()).getStatus())
+            .isEqualTo(BatchFile.Status.COMPLETE);
+        
+    }
+    
+    
 
     @Test
     public void shouldReadInteractions() {

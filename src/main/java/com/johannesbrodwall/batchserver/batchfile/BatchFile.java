@@ -12,6 +12,9 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode(of="id")
 public class BatchFile {
+    public static enum Status {
+        PENDING, PROCESSING, COMPLETE
+    }
     
     @Getter @Setter
     private UUID id;
@@ -27,5 +30,8 @@ public class BatchFile {
     
     @Getter @Setter
     private String submittedFileName;
+    
+    @Getter @Setter
+    private Status status = Status.PENDING;
 
 }

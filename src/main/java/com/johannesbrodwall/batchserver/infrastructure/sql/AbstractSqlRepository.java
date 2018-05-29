@@ -1,5 +1,6 @@
 package com.johannesbrodwall.batchserver.infrastructure.sql;
 
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -58,11 +60,23 @@ public abstract class AbstractSqlRepository {
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 for (int i = 0; i < arguments.size(); i++) {
-                    statement.setObject(i+1, arguments.get(i));
+                    setParameter(statement, i+1, arguments.get(i));
                 }
                 
                 statement.executeUpdate();
             }
+        }
+    }
+
+    private void setParameter(PreparedStatement statement, int parameterIndex, Object param) throws SQLException {
+        if (param instanceof UUID) {
+            statement.setObject(parameterIndex, param.toString());
+        } else if (param instanceof Enum) {
+            statement.setObject(parameterIndex, param.toString());
+        } else if (param instanceof Path) {
+            statement.setObject(parameterIndex, param.toString());
+        } else {
+            statement.setObject(parameterIndex, param);
         }
     }
 

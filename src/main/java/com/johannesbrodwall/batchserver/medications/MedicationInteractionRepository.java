@@ -27,8 +27,7 @@ public class MedicationInteractionRepository extends AbstractSqlRepository {
     }
     
     public void deleteAll() {
-        // TODO Auto-generated method stub
-        
+        executeUpdate("delete from medication_interactions");
     }
 
     public void save(MedicationInteraction interaction) {
