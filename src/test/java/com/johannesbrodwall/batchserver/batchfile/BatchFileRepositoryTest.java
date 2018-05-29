@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.sql.DataSource;
 
+import org.flywaydb.core.Flyway;
+import org.h2.jdbcx.JdbcDataSource;
 import org.junit.Test;
 
 import com.johannesbrodwall.batchserver.BatchServerSampleData;
@@ -34,8 +36,14 @@ public class BatchFileRepositoryTest {
     }
 
     private DataSource testDataSource() {
-        // TODO Auto-generated method stub
-        return null;
+        JdbcDataSource dataSource = new JdbcDataSource();
+        dataSource.setUrl("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
+        
+        Flyway flyway = new Flyway();
+        flyway.setDataSource(dataSource);
+        flyway.migrate();
+        
+        return dataSource;
     }
     
     
