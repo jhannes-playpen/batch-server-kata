@@ -6,7 +6,6 @@ import java.util.zip.GZIPInputStream;
 
 import org.eaxy.Document;
 import org.eaxy.Element;
-import org.eaxy.ElementSet;
 import org.eaxy.Xml;
 
 public class FestFileProcessor {

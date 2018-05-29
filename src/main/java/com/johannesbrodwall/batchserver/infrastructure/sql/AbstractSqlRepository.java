@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -38,7 +37,7 @@ public abstract class AbstractSqlRepository {
     }
 
     @SneakyThrows(SQLException.class)
-    protected <T> T queryForSingle(String sql, UUID id, RowMapper<T> mapper) {
+    protected <T> T queryForSingle(String sql, Object id, RowMapper<T> mapper) {
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setObject(1, id);

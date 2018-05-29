@@ -21,6 +21,8 @@ public class MedicationInteractionRepository extends AbstractSqlRepository {
     private MedicationInteraction mapRow(ResultSet rs) throws SQLException {
         MedicationInteraction result = new MedicationInteraction();
         result.setId(rs.getString("id"));
+        result.setClinicalConsequence(rs.getString("clinical_consequence"));
+        result.setInteractionMechanism(rs.getString("interaction_mechanism"));
         return result;
     }
     
@@ -31,8 +33,15 @@ public class MedicationInteractionRepository extends AbstractSqlRepository {
 
     public void save(MedicationInteraction interaction) {
         executeUpdate(
-                "insert into medication_interactions (id) values (?)",
-                interaction.getId());
+                "insert into medication_interactions (id, clinical_consequence, interaction_mechanism) values (?, ?, ?)",
+                interaction.getId(),
+                interaction.getClinicalConsequence(),
+                interaction.getInteractionMechanism());
+    }
+
+    public MedicationInteraction retrieve(String id) {
+        return queryForSingle("select * from medication_interactions where id = ?", id, this::mapRow);
+
     }
 
 }
