@@ -55,6 +55,11 @@
 			<artifactId>flyway-core</artifactId>
 			<version>5.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.eaxy</groupId>
+			<artifactId>eaxy</artifactId>
+			<version>0.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
