@@ -7,7 +7,7 @@ import com.johannesbrodwall.batchserver.batchfile.BatchFileRepository;
 public class BatchServerContext {
 
     public Supplier<BatchFileRepository> batchFileRepository() {
-        return () -> new BatchFileRepository();
+        return () -> new BatchFileRepository(null);
     }
 
 }
