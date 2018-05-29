@@ -6,9 +6,15 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 
+import com.johannesbrodwall.batchserver.batchfile.BatchServlet;
+import com.johannesbrodwall.batchserver.util.RedirectServlet;
+
 public class BatchAppServer {
     
     public static void main(String[] args) throws Exception {
+        BatchServerContext applicationContext = new BatchServerContext();
+        
+        
         Tomcat tomcat = new Tomcat();
         tomcat.setPort(10080);
         tomcat.start();
@@ -20,7 +26,7 @@ public class BatchAppServer {
         publicContext.addServletMappingDecoded("/", "default");
         
         Context apiContext = tomcat.addContext("/api", null);
-        Tomcat.addServlet(apiContext, "batchServlet", new BatchServlet())
+        Tomcat.addServlet(apiContext, "batchServlet", new BatchServlet(applicationContext))
             .setMultipartConfigElement(new MultipartConfigElement(""));
         apiContext.addServletMappingDecoded("/batchFiles/*", "batchServlet");
         
