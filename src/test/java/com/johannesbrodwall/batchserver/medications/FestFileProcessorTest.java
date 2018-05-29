@@ -12,7 +12,6 @@ import org.eaxy.Element;
 import org.eaxy.Namespace;
 import org.eaxy.Validator;
 import org.eaxy.Xml;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.johannesbrodwall.batchserver.TestDataSource;
@@ -25,9 +24,7 @@ public class FestFileProcessorTest {
     private DataSource dataSource = TestDataSource.testDataSource();
     
     @Test
-    @Ignore
     public void shouldReadFullFile() throws IOException {
-        MedicationInteractionRepository repository = new MedicationInteractionRepository(dataSource);
         repository.deleteAll();
         assertThat(repository.list()).isEmpty();
 
@@ -79,5 +76,6 @@ public class FestFileProcessorTest {
     }
     
     private Random random = new Random();
-    private FestFileProcessor processor = new FestFileProcessor();
+    private MedicationInteractionRepository repository = new MedicationInteractionRepository(dataSource);
+    private FestFileBatch processor = new FestFileBatch(repository);
 }

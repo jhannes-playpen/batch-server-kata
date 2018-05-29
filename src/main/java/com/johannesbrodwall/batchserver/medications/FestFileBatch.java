@@ -8,7 +8,13 @@ import org.eaxy.Document;
 import org.eaxy.Element;
 import org.eaxy.Xml;
 
-public class FestFileProcessor {
+public class FestFileBatch {
+    
+    private MedicationInteractionRepository repository;
+
+    public FestFileBatch(MedicationInteractionRepository repository) {
+        this.repository = repository;
+    }
 
     public MedicationInteraction readInteraction(Element oppfWrapper) {
         MedicationInteraction result = new MedicationInteraction();
@@ -34,9 +40,8 @@ public class FestFileProcessor {
         Document document = Xml.readAndClose(inputStream);
         
         for (Element element : document.find("KatInteraksjon", "OppfInteraksjon").check()) {
-            System.out.println(readInteraction(element));
+            repository.save(readInteraction(element));
         }
-        
     }
 
 }
