@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,10 +52,10 @@ public class BatchFileRepository {
         long fileLength = Files.copy(inputStream, tmpFile, StandardCopyOption.REPLACE_EXISTING);
         
         BatchFile batchFile = new BatchFile();
-//        batchFile.setFileLocation(tmpFile);
-//        batchFile.setFileLength(fileLength);
-//        batchFile.setUploadTime(Instant.now());
-//        batchFile.setSubmittedFileName(submittedFileName);
+        batchFile.setFileLocation(tmpFile);
+        batchFile.setFileLength(fileLength);
+        batchFile.setUploadTime(Instant.now());
+        batchFile.setSubmittedFileName(submittedFileName);
         
         save(batchFile);
     }
@@ -64,8 +65,13 @@ public class BatchFileRepository {
         file.setId(UUID.randomUUID());
         
         try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("insert into batch_files (id) values (?)")) {
-                statement.setObject(1, file.getId());
+            String sql = "insert into batch_files (id, file_location, file_length, submitted_filename, upload_time) values (?, ?, ?, ?, ?)";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setObject(1, file.getId().toString());
+                statement.setString(2, file.getFileLocation().toString());
+                statement.setObject(3, file.getFileLength());
+                statement.setObject(4, file.getSubmittedFileName());
+                statement.setObject(5, file.getUploadTime());
                 
                 statement.executeUpdate();
             }
@@ -92,6 +98,10 @@ public class BatchFileRepository {
     private BatchFile mapBatchFile(ResultSet rs) throws SQLException {
         BatchFile batchFile = new BatchFile();
         batchFile.setId(UUID.fromString(rs.getString("id")));
+        batchFile.setFileLocation(Paths.get(rs.getString("file_location")));
+        batchFile.setFileLength(rs.getLong("file_length"));
+        batchFile.setSubmittedFileName(rs.getString("submitted_filename"));
+        batchFile.setUploadTime(rs.getTimestamp("upload_time").toInstant());
         return batchFile;
     }
 
