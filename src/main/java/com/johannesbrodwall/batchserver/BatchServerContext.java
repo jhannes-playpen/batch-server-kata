@@ -8,13 +8,18 @@ import javax.sql.DataSource;
 
 import com.johannesbrodwall.batchserver.batchfile.BatchFileRepository;
 import com.johannesbrodwall.batchserver.infrastructure.sql.DataSourceImpl;
+import com.johannesbrodwall.batchserver.medications.MedicationInteractionRepository;
 
 public class BatchServerContext {
     
-    private DataSourceImpl dataSource = new DataSourceImpl();
+    private DataSourceImpl dataSource = new DataSourceImpl(getDataSourceProperties());
 
     public Supplier<BatchFileRepository> batchFileRepository() {
         return () -> new BatchFileRepository(getDataSource());
+    }
+
+    public Supplier<MedicationInteractionRepository> medicationInteractionRepository() {
+        return () -> new MedicationInteractionRepository(getDataSource());
     }
 
     private DataSource getDataSource() {
@@ -22,12 +27,13 @@ public class BatchServerContext {
         return dataSource;
     }
 
-    private Map<String, String> getDataSourceProperties() {
+    private static Map<String, String> getDataSourceProperties() {
         Map<String, String> map = new HashMap<>();
         map.put("url", "jdbc:h2:file:./target/dev.db");
         map.put("user", "sa");
         map.put("password", "");
         return map;
     }
+
 
 }

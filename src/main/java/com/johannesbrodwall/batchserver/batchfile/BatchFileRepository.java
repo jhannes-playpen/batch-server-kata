@@ -27,7 +27,7 @@ public class BatchFileRepository extends AbstractSqlRepository {
         return queryForList("select * from batch_files", this::mapBatchFile);
     }
 
-    public void save(String batchType, String submittedFileName, InputStream inputStream) throws IOException {
+    public BatchFile save(String batchType, String submittedFileName, InputStream inputStream) throws IOException {
         Path tmpDir = Paths.get("tmp");
         Files.createDirectories(tmpDir);
         
@@ -42,6 +42,8 @@ public class BatchFileRepository extends AbstractSqlRepository {
         batchFile.setSubmittedFileName(submittedFileName);
         
         save(batchFile);
+        
+        return batchFile;
     }
 
     public void save(BatchFile file) {

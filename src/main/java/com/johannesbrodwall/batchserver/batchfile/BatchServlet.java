@@ -2,6 +2,8 @@ package com.johannesbrodwall.batchserver.batchfile;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 
 import javax.servlet.ServletException;
@@ -14,12 +16,18 @@ import org.jsonbuddy.JsonArray;
 import org.jsonbuddy.JsonObject;
 
 import com.johannesbrodwall.batchserver.BatchServerContext;
+import com.johannesbrodwall.batchserver.medications.FestFileBatch;
 
 public class BatchServlet extends HttpServlet {
+   
+    private Executor executor = Executors.newFixedThreadPool(10);
     
     private Supplier<BatchFileRepository> repository;
 
+    private BatchServerContext applicationContext;
+
     public BatchServlet(BatchServerContext applicationContext) {
+        this.applicationContext = applicationContext;
         this.repository = applicationContext.batchFileRepository();
     }
 
@@ -39,9 +47,11 @@ public class BatchServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Part part = req.getPart("batchfile");
-        repository.get().save(req.getParameter("batchtype"),
+        BatchFile batchFile = repository.get().save(req.getParameter("batchtype"),
                 part.getSubmittedFileName(),
                 part.getInputStream());
+        
+        executor.execute(new FestFileBatch(batchFile.getId(), applicationContext));
         
         
         resp.sendRedirect("/");

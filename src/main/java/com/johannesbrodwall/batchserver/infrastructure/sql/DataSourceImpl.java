@@ -12,10 +12,16 @@ import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
 import org.h2.jdbcx.JdbcDataSource;
 
+import lombok.SneakyThrows;
+
 public class DataSourceImpl implements DataSource {
 
     private Map<String, String> dataSourceProperties;
     private DataSource dataSource;
+
+    public DataSourceImpl(Map<String, String> dataSourceProperties) {
+        updateDataSource(dataSourceProperties);
+    }
 
     @Override
     public PrintWriter getLogWriter() throws SQLException {
@@ -66,18 +72,24 @@ public class DataSourceImpl implements DataSource {
         if (dataSourceProperties.equals(this.dataSourceProperties)) {
             return;
         }
+        updateDataSource(dataSourceProperties);
+    }
+
+    @SneakyThrows(SQLException.class)
+    private void updateDataSource(Map<String, String> dataSourceProperties) {
         this.dataSourceProperties = dataSourceProperties;
         
         JdbcDataSource jdbcDataSource = new JdbcDataSource();
         jdbcDataSource.setUrl(dataSourceProperties.get("url"));
         jdbcDataSource.setUser(dataSourceProperties.get("user"));
         jdbcDataSource.setPassword(dataSourceProperties.get("password"));
+        this.dataSource = jdbcDataSource;
+        
+        dataSource.getConnection().close();
         
         Flyway flyway = new Flyway();
         flyway.setDataSource(dataSource);
         flyway.migrate();
-        
-        this.dataSource = jdbcDataSource;
     }
 
 
