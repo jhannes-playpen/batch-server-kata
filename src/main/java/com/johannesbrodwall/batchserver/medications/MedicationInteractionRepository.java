@@ -1,16 +1,24 @@
 package com.johannesbrodwall.batchserver.medications;
 
+import java.sql.ResultSet;
 import java.util.List;
 
 import javax.sql.DataSource;
 
-public class MedicationInteractionRepository {
+import com.johannesbrodwall.batchserver.batchfile.AbstractSqlRepository;
+
+public class MedicationInteractionRepository extends AbstractSqlRepository {
 
     public MedicationInteractionRepository(DataSource dataSource) {
+        super(dataSource);
     }
 
     public List<MedicationInteraction> list() {
-        return null;
+        return queryForList("select * from medication_interactions", this::mapRow);
+    }
+    
+    private MedicationInteraction mapRow(ResultSet rs) {
+        return new MedicationInteraction();
     }
     
     public void deleteAll() {
