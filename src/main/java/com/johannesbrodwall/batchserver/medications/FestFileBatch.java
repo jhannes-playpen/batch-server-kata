@@ -8,7 +8,10 @@ import java.io.Reader;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.input.BOMInputStream;
 import org.eaxy.Document;
 import org.eaxy.Element;
 import org.eaxy.ElementSet;
@@ -16,8 +19,8 @@ import org.eaxy.Xml;
 
 import com.johannesbrodwall.batchserver.BatchServerContext;
 import com.johannesbrodwall.batchserver.batchfile.BatchFile;
-import com.johannesbrodwall.batchserver.batchfile.BatchFileRepository;
 import com.johannesbrodwall.batchserver.batchfile.BatchFile.Status;
+import com.johannesbrodwall.batchserver.batchfile.BatchFileRepository;
 
 import lombok.SneakyThrows;
 
@@ -70,6 +73,16 @@ public class FestFileBatch implements Runnable {
     public void processFile(InputStream inputStream, String filename) throws IOException {
         if (filename.endsWith(".gz")) {
             process(new GZIPInputStream(inputStream));
+        } else if (filename.endsWith(".zip")) {
+            try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
+                ZipEntry entry;
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                    if (entry.getName().equals("fest251.xml")) {
+                        System.out.println(entry.getSize());
+                        process(new BOMInputStream(zipInputStream));
+                    }
+                }
+            }
         } else {
             process(inputStream);
         }
