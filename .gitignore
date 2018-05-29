@@ -1,0 +1,7 @@
+/target
+/tmp
+/tomcat.10080
+/.classpath
+/.project
+/.settings
+/src/main/app/node_modules
